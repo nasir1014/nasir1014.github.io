@@ -21,7 +21,7 @@
 
 
 (function () {
-    const allowedDomain = "nasirlintech.web.app";
+    const allowedDomain = "nasir1014.github.io";
     document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
         const cssDomain = new URL(link.href).hostname;
         if (cssDomain !== allowedDomain) {
