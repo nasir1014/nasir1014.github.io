@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE傳送檔案到Google Drive開源碼與設定說明(附小羊開源碼)</title>
+    <link rel="stylesheet" href="../blog.css">
+    <script>
+      const encodedScriptTag = "PHNjcmlwdCBzcmM9ImxvY2tjb3B5cmlnaHQuanMiPjwvc2NyaXB0Pg==";
+      const decodedScriptTag = atob(encodedScriptTag);
+      document.write(decodedScriptTag);
+  </script>
+</head>
+<body>
+    <div class="watermark">Nasir Blog</div>
+    <div class="content">
+        <div class="container">
+            <h1>LINE傳送檔案到 Google Drive開源碼與設定說明(附小羊開源碼)</h1>
+            <p class="post-meta">Published on Sun, Nov 10, 2024 by Nasir</p>
+            <div class="post-content">
+                <p>在社群平台上發佈的 LINE 傳送檔案到 Google Drive 工具引起了熱烈反應！大家覺得這個工具很好用，因此決定將內部程式碼開源給大家。
+                </p>
+                <p>我喜歡想像，加上我是一個極簡主義者，有天忽然想到，疑！用LINE將檔案傳到Google drive 我這樣就不用在手機上再安裝Google drive 了耶！ 於是就開始列出想要用的平台與架構！ 他其實有很多種方式可以用，但是我比較喜歡極簡跟整合，於是我挑了Google App Script ，不但可以少註冊很多帳號，也可以較爲簡單的將功能呈現！
+                </p>
+
+                <h2>設定過程</h2>
+                <p>以下是設定流程，相信我已經開源最複雜的程式碼後，設定對大家來說不難吧（？ 應該</p>
+
+                <h3>STEP 1</h3>
+                <p>先到 <a href="https://developers.line.biz/" target="_blank">LINE Developers 官方開發者專區</a> 裡新增一個開發者。</p>
+
+                <h3>STEP 2</h3>
+                <p>到 LINE OFFICIAL ACCOUNT 官方帳號中，建立一個上傳到 Google Drive 專屬的『官方帳號』。</p>
+
+                <h3>STEP 3</h3>
+                <p>在新創立的官方帳號中，開啟 Message API 功能。</p>
+
+                <h3>STEP 4</h3>
+                <p>回到 LINE 開發者頁面，進入 Message API，按下 access token，獲取官方帳號的 API Key。</p>
+
+                <h3>STEP 5</h3>
+                <p>利用 Webhook 功能取得 LINE USER ID。可以利用 Google Sheet 建立一個 Webhook Server，點擊 <a href="webhookuserid.html" target="_blank">這裡</a> 去了解要如何架設 Webhook 紀錄伺服器。</p>
+
+                <h3>STEP 6</h3>
+                <p>取得 User ID 和 LINE Channel API 後，於 Google Drive 裡建立一個 Google App Script，複製以下程式碼，填入相對應的 User ID 和 LINE Channel API。部署時按下『網頁應用程式』並取得連結。</p>
+
+                <button class="back-button" onclick="copyToClipboard()">點擊我複製程式碼</button>
+                <pre>
+const LINE_CHANNEL_ACCESS_TOKEN = '這裡填入CHANNEL ACCESS TOKEN';
+const LINE_USER_ID = '這裡填入USERID';
+const FOLDER_NAME = 'LINEAPPDATA';
+
+function doPost(e) {
+  const event = JSON.parse(e.postData.contents).events[0];
+  if (event.message && (event.message.type === 'image' || event.message.type === 'file')) {
+    const messageId = event.message.id;
+
+    if (!isFileAlreadyUploaded(messageId)) {
+      saveFileToGoogleDrive(messageId);
+    } else {
+      pushMessageToLine('檔案已經上傳過，不重複上傳。');
+    }
+  }
+
+  return ContentService.createTextOutput('OK').setMimeType(ContentService.MimeType.TEXT);
+}
+
+function saveFileToGoogleDrive(messageId) {
+  const url = `https://api-data.line.me/v2/bot/message/${messageId}/content`;
+  const headers = {
+    'Authorization': `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`
+  };
+
+  try {
+    const response = UrlFetchApp.fetch(url, { headers: headers });
+    const blob = response.getBlob();
+    const folder = getOrCreateFolder(FOLDER_NAME);
+
+    const fileName = `file_${messageId}`;
+    blob.setName(fileName);
+
+    const file = folder.createFile(blob);
+    const fileUrl = file.getUrl();
+
+    pushMessageToLine(`檔案已成功上傳至 Google Drive。檔案連結：${fileUrl}`);
+  } catch (error) {
+    pushMessageToLine('上傳檔案失敗，請稍後再試。');
+  }
+}
+
+function isFileAlreadyUploaded(messageId) {
+  const folder = getOrCreateFolder(FOLDER_NAME);
+  const files = folder.getFilesByName(`file_${messageId}`);
+  return files.hasNext();
+}
+
+function pushMessageToLine(message) {
+  const url = 'https://api.line.me/v2/bot/message/push';
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`
+  };
+
+  const postData = {
+    to: LINE_USER_ID,
+    messages: [{ type: 'text', text: message }]
+  };
+
+  try {
+    UrlFetchApp.fetch(url, {
+      headers: headers,
+      method: 'post',
+      payload: JSON.stringify(postData)
+    });
+  } catch (error) {
+    Logger.log('推送訊息失敗：' + error);
+  }
+}
+
+function getOrCreateFolder(folderName) {
+  const folders = DriveApp.getFoldersByName(folderName);
+  return folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
+}
+                </pre>
+
+                <h3>STEP 7</h3>
+                <p>回到 LINE Developers，將取得的 Google App script 連結貼上到 Webhook 裡完成設定。</p>
+
+                <h3>STEP 8</h3>
+                <p>設定完成後，即可在手機上使用！（在步驟 5 取得 User ID 時就需加好友，所以記得一定要看步驟五的Webhook ID 取得方式）</p>
+            </div>
+            <button class="back-button" onclick="window.location.href='../index.html'">返回</button>
+        </div>
+    </div>
+    <footer>&copy; 2024 Nasir</footer>
+
+    <script>
+        function copyToClipboard() {
+            const codeText = document.querySelector("pre").innerText;
+            navigator.clipboard.writeText(codeText).then(() => {
+                alert("程式碼已複製到剪貼簿！");
+            }).catch(() => {
+                alert("複製失敗，請手動複製程式碼。");
+            });
+        }
+    </script>
+</body>
+</html>
