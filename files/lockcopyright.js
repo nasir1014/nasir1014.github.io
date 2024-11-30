@@ -1,4 +1,35 @@
+(function () {
+    const allowedDomain = "nasirlintech.web.app";
+    if (window.location.hostname !== allowedDomain) {
+        alert("Nasir 開發者所有，請聯繫作者");
+        window.location.href = "https://nasir1014.github.io";
+    }
+})();
 
+
+(function () {
+    let devtoolsOpen = false;
+    const element = new Image();
+    Object.defineProperty(element, "id", {
+        get: function () {
+            devtoolsOpen = true;
+            window.location.href = "https://nasir1014.github.io";
+        }
+    });
+    console.log(element);
+})();
+
+
+(function () {
+    const allowedDomain = "nasir1014.github.io";
+    document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+        const cssDomain = new URL(link.href).hostname;
+        if (cssDomain !== allowedDomain) {
+            link.parentNode.removeChild(link);
+            console.warn("CSS禁止在未授權網域加載。");
+        }
+    });
+})();
 
 document.addEventListener('contextmenu', event => event.preventDefault());
 document.onkeydown = function(e) {
