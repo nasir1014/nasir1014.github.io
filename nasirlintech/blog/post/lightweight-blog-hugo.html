@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>輕量級落格平台建置篇：HUGO</title>
+    <link rel="stylesheet" href="../blog.css">
+    <script>
+        const encodedScriptTag = "PHNjcmlwdCBzcmM9ImxvY2tjb3B5cmlnaHQuanMiPjwvc2NyaXB0Pg==";
+        const decodedScriptTag = atob(encodedScriptTag);
+        document.write(decodedScriptTag);
+    </script>
+</head>
+<body>
+    <div class="watermark">Nasir Blog</div>
+    <div class="content">
+        <div class="container">
+            <h1 style="color: #f0f0f0; margin-bottom: 20px;">輕量級落格平台建置篇：HUGO</h1>
+            <p class="post-meta">Published on Sun, Oct 13, 2024 by Nasir</p>
+            <div class="post-content">
+                <p>在這篇文章中，我們將探討如何使用 Hugo 來建置一個輕量級的部落格平台。Hugo 是一個快速的靜態網站生成器，非常適合用來建置個人網站或部落格。</p>
+                <h2>Hugo 是什麼？</h2>
+                <p>Hugo 就是一個 Markdown 語法建立部落格的工具，常見的部落格建置工具可能都是那種 Wordpress 或是其他線上平台，但是這些要嘛要維護主機，主機的費用價格也不便宜，而且像 Wordpress 那種使用資料庫 PHP 進行架站的，除了要顧好資料庫外，主機流量也需要消耗蠻多的，一點都不輕量。</p>
+                <p>平台式的如果哪天部落格平台忽然無預警倒閉等等，往往許多撰寫的內容都會付之一炬。</p>
+                <p>筆者後來找到一套適合來建置部落格的工具: Hugo</p>
+                <p>目前 Nasir 也是利用他來進行建置部落格。</p>
+                <p>使用起來真的超級輕量，不太會造成主機伺服器負擔，而且在撰寫的時候也是使用 Markdown 語法進行邊寫。</p>
+                <p>雖然可能在使用過程上步驟比較繁瑣，但是習慣後，加上後續的維護上，其實是個蠻方便的寫作平台！</p>
+                <p>說了這麼多，要如何開始＆進行安裝？</p>
+
+                <h3>1. 安裝Hugo</h3>
+                <p>首先我們要先在電腦上安裝 Hugo。</p>
+                <p>蘋果電腦打開終端機</p>
+                <p>Windows 電腦打開 CMD</p>
+                <pre><code>brew install hugo</code></pre>
+                <p>之後他就會在電腦中裝入 Hugo 工具了。</p>
+
+                <h3>2. 建立一個新網站</h3>
+                <p>安裝完後，要建立一個新的網站，在 CMD 或是終端機中輸入以下指令：</p>
+                <pre><code>hugo new site my-blog</code></pre>
+                <p>他就會出現在使用者的資料夾下。</p>
+
+                <h3>3. 選擇並套用主題及模板</h3>
+                <p>Hugo 有提供許多主題可以供使用者套用，可以到 <a href="https://themes.gohugo.io/">https://themes.gohugo.io/</a> 去挑選喜歡的主題，然後複製主題的連結。</p>
+                <pre><code>
+cd my-blog
+git init
+git submodule add https://github.com/your-theme-repo themes/your-theme
+                </code></pre>
+                <p>主題下載完成後，要到剛剛建立的部落格資料夾中，裡面找到一個 toml 的檔案，點開後把</p>
+                <p><code>theme = "your-theme"</code> 改成自己主題的名字！</p>
+
+                <h3>4. 開始建立部落格文章</h3>
+                <pre><code>hugo new posts/my-first-post.md</code></pre>
+                <p>一樣也是在終端機或是 CMD 裡面進行輸入，輸入完後，會在 content/posts 裡建立一個 Markdown 的文件，就可以來編輯這個文件進行文章編輯。</p>
+
+                <h3>5. 開啟本地端Server</h3>
+                <p>由於是 Markdown 進行邊寫的，所以沒有所謂的即時預覽，所以需要開啟 Server 才能看到網頁呈現的樣子，這時可以利用 Hugo 提供的本地端 Server 進行預覽！</p>
+                <pre><code>hugo server</code></pre>
+                <p>這樣子就可以預覽網頁了。</p>
+
+                <h3>6. 把部落格變成靜態網頁</h3>
+                <pre><code>hugo</code></pre>
+                <p>輸入完後，就會在剛剛部落格資料夾裡面建立一個 public 的資料夾，這時生成的這個檔案就可以上傳到你的主機和伺服器上，像是 GitHub Page 等等靜態網頁主機！</p>
+            </div>
+            <button class="back-button" onclick="window.location.href='../index.html'">返回</button>
+        </div>
+    </div>
+    <footer>&copy; 2024 Nasir</footer>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小羊批次新增Apple日曆轉換工具</title>
+    <link rel="stylesheet" href="../blog.css">
+    <script>
+        const encodedScriptTag = "PHNjcmlwdCBzcmM9ImxvY2tjb3B5cmlnaHQuanMiPjwvc2NyaXB0Pg==";
+        const decodedScriptTag = atob(encodedScriptTag);
+        document.write(decodedScriptTag);
+    </script>
+     <style>
+        .post-content {
+            max-width: 100%;
+            color: #f0f0f0;
+            font-family: 'Roboto Mono', monospace;
+            padding: 20px; 
+            box-sizing: border-box; 
+        }
+        label {
+            display: block;
+            margin: 15px 0 8px;
+            font-weight: bold;
+            color: #cccccc;
+        }
+        textarea, input[type="number"], input[type="text"] {
+            width: 100%;
+            max-width: 580px;
+            padding: 12px;
+            margin-bottom: 20px; 
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: 1em;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            font-family: 'Roboto Mono', monospace;
+        }
+        button {
+            width: 100%;
+            max-width: 580px; /* 限制按鈕最大寬度 */
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #f0f0f0;
+            border: 2px solid #444;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-family: 'Roboto Mono', monospace;
+            clip-path: polygon(0 0, 95% 0, 100% 100%, 5% 100%);
+            margin: 0 auto;
+            display: block;
+        }
+        button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+        .result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">Nasir Blog</div>
+    <div class="content">
+        <div class="container">
+            <h1>批次新增Apple日曆轉換工具</h1>
+            <p class="post-meta">Published on Sun, Nov 17, 2024 by Nasir</p>
+            <div class="post-content">
+                <label for="year">年份:</label>
+                <input type="number" id="year" name="year" placeholder="請輸入西元年份" required>
+
+                <label for="content">活動:</label>
+                <textarea id="content" name="content" placeholder="請輸入活動內容"></textarea>
+                
+                <button onclick="generateICS()">產出批次檔案</button>
+            </div>
+            <button class="back-button" onclick="window.location.href='../index.html'">返回</button>
+        </div>
+    </div>
+    <footer>&copy; 2024 Nasir</footer>
+
+    <script>
+        function generateICS() {
+            const inputYear = parseInt(document.getElementById('year').value.trim());
+            const content = document.getElementById('content').value.trim();
+            const lines = content.split('\n').map(line => line.trim()).filter(line => line);
+
+            if (!inputYear || lines.length === 0) {
+                alert('請完整輸入年份和活動內容唷！');
+                return;
+            }
+
+            const events = [];
+            let invalidLines = [];
+
+            lines.forEach(line => {
+                try {
+                    const normalizedLine = line
+                        .replace(/[～~－]/g, '-')
+                        .replace(/[：]/g, ':')   
+                        .replace(/\s+/g, ' ')   
+                        .replace(/\(.*?\)/g, '') 
+                        .trim();
+
+                    const datePartMatch = normalizedLine.match(/(\d{1,4}\/\d{1,2}\/\d{1,2}|\d{1,2}\/\d{1,2})([-~]\d{1,2}\/?\d{0,2})?/);
+                    if (!datePartMatch) throw new Error(`日期格式錯誤：${line}`);
+
+                    const datePart = datePartMatch[0];
+                    const title = normalizedLine.replace(datePart, '').trim() || '未命名活動';
+
+                    const dateRange = datePart.split(/[-~]/);
+                    let [startYear, startMonth, startDay] = yearMonthDay(inputYear, dateRange[0]);
+                    let [endYear, endMonth, endDay] = dateRange[1] ? yearMonthDay(inputYear, dateRange[1], startYear, startMonth) : [startYear, startMonth, startDay];
+
+                    const startDate = `${startYear}${startMonth}${startDay}`;
+                    const endDate = `${endYear}${endMonth}${endDay}`;
+
+                    let timeRange = normalizedLine.match(/\d{1,2}:\d{2}-\d{1,2}:\d{2}/);
+                    let startTime = '0000', endTime = '2359';
+
+                    if (timeRange) {
+                        [startTime, endTime] = timeRange[0].split('-').map(t => t.replace(':', ''));
+                    }
+
+                    if (startDate !== endDate || startTime === '0000' && endTime === '2359') {
+                        events.push({
+                            title,
+                            start: startDate,
+                            end: `${endYear}${endMonth}${(parseInt(endDay) + 1).toString().padStart(2, '0')}`, // RFC 5545 結束日期 +1
+                            isAllDay: true,
+                        });
+                    } else {
+                        events.push({
+                            title,
+                            start: `${startDate}T${startTime}00`,
+                            end: `${endDate}T${endTime}00`,
+                            isAllDay: false,
+                        });
+                    }
+                } catch (e) {
+                    invalidLines.push(line);
+                }
+            });
+
+            if (invalidLines.length > 0) {
+                alert(`以下行格式無法解析，請檢查:\n${invalidLines.join('\n')}`);
+            }
+
+            if (events.length === 0) {
+                alert('沒有有效的活動，請檢查輸入格式！');
+                return;
+            }
+
+         
+            let icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Your App//EN\n`;
+            events.forEach(event => {
+                icsContent += `BEGIN:VEVENT\n`;
+                icsContent += `SUMMARY:${event.title}\n`;
+                icsContent += `DTSTART${event.isAllDay ? ';VALUE=DATE' : ''}:${event.start}\n`;
+                if (event.isAllDay) {
+                    icsContent += `DTEND;VALUE=DATE:${event.end}\n`;
+                } else {
+                    icsContent += `DTEND:${event.end}\n`;
+                }
+                icsContent += `END:VEVENT\n`;
+            });
+            icsContent += `END:VCALENDAR`;
+
+            const blob = new Blob([icsContent], { type: 'text/calendar' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `schedule_${inputYear}.ics`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function yearMonthDay(defaultYear, date, previousYear = null, previousMonth = null) {
+            const parts = date.split('/').map(x => x.trim());
+            let year = parts.length === 3 ? parseInt(parts[0]) : defaultYear;
+            let month = parts.length === 3 ? parts[1] : parts[0];
+            let day = parts.length === 3 ? parts[2] : parts[1];
+
+            if (year < 1000) year += 1911; 
+
+            if (!day) [day, month] = [month, previousMonth || '01'];
+
+            if (parseInt(month) < parseInt(previousMonth || '01') && previousYear) {
+                year = previousYear + 1; 
+            }
+
+            return [year.toString(), month.padStart(2, '0'), day.padStart(2, '0')];
+        }
+    </script>
+</body>
+</html>
