@@ -5,67 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小羊題目擷取工具</title>
     <link rel="stylesheet" href="../blog.css">
-    <script>
-        const encodedScriptTag = "PHNjcmlwdCBzcmM9ImxvY2tjb3B5cmlnaHQuanMiPjwvc2NyaXB0Pg==";
-        const decodedScriptTag = atob(encodedScriptTag);
-        document.write(decodedScriptTag);
-    </script>
-    <style>
-        .post-content {
-            max-width: 100%;
-            color: #f0f0f0;
-            font-family: 'Roboto Mono', monospace;
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-            font-weight: bold;
-            color: #cccccc;
-        }
-        textarea, input[type="number"], input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #444;
-            border-radius: 4px;
-            font-size: 1em;
-            background-color: #1e1e1e;
-            color: #e0e0e0;
-            font-family: 'Roboto Mono', monospace;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #f0f0f0;
-            border: 2px solid #444;
-            border-radius: 5px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            font-family: 'Roboto Mono', monospace;
-            clip-path: polygon(0 0, 95% 0, 100% 100%, 5% 100%);
-        }
-        button:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-5px);
-        }
-        .result {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 1.2em;
-            color: #f0f0f0;
-        }
-        .image-container {
-            text-align: center;
-            margin: 15px 0;
-        }
-        .image-container img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
-        }
-    </style>
 </head>
 <body>
     <div class="watermark">Nasir Blog</div>
@@ -90,31 +29,6 @@
         </div>
     </div>
     <footer>&copy; 2024 Nasir</footer>
-
-    <script>
-        function convertToJSON() {
-            const inputText = document.getElementById('inputText').value;
-            const rows = inputText.trim().split('\n');
-            let result = [];
-
-            rows.forEach(row => {
-                const columns = row.split('\t');
-                if (columns.length === 6) {
-                    const question = columns[0];
-                    const options = [columns[1], columns[2], columns[3], columns[4]];
-                    const answer = options[columns[5].charCodeAt(0) - 'A'.charCodeAt(0)];
-
-                    result.push({
-                        question: question,
-                        options: options,
-                        answer: answer
-                    });
-                }
-            });
-
-            const outputText = result.map(item => JSON.stringify(item)).join(',\n');
-            document.getElementById('outputText').value = `[${outputText}]`;
-        }
-    </script>
+    <script src="../java/change.js"></script>
 </body>
 </html>
