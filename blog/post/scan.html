@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小羊掃描計算機</title>
+    <link rel="stylesheet" href="../blog.css">
+    <script>
+        const encodedScriptTag = "PHNjcmlwdCBzcmM9ImxvY2tjb3B5cmlnaHQuanMiPjwvc2NyaXB0Pg==";
+        const decodedScriptTag = atob(encodedScriptTag);
+        document.write(decodedScriptTag);
+    </script>
+</head>
+<body>
+    <div class="watermark">Nasir Blog</div>
+    <div class="content">
+        <div class="container">
+            <h1>小羊掃描計算機</h1>
+            <p class="post-meta">Published on Sun, Oct 6, 2024 by Nasir</p>
+            <div class="post-content">
+                <label for="bookName">名稱：</label>
+                <input type="text" id="bookName" placeholder="輸入名稱">
+
+                <label for="bookPrice">原檔價格：</label>
+                <input type="number" id="bookPrice" placeholder="輸入價格" step="0.01">
+
+                <label for="scanFee">掃描費用：</label>
+                <input type="number" id="scanFee" placeholder="輸入掃描費用" step="0.01">
+
+                <label for="shippingCost">送掃運費：</label>
+                <input type="number" id="shippingCost" placeholder="輸入送掃運費" step="0.01">
+
+                <label for="peopleCount">人數：</label>
+                <input type="number" id="peopleCount" placeholder="輸入人數" min="1">
+
+                <button id="calculateBtn">計算每人承擔費用</button>
+
+                <div class="result" id="result"></div>
+            </div>
+            <button class="back-button" onclick="window.location.href='../index.html'">返回</button>
+        </div>
+    </div>
+    <footer>&copy; 2024 Nasir</footer>
+    <script src="../java/scan.js"></script>
+</body>
+</html>
